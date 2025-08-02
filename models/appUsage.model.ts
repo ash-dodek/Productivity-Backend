@@ -1,19 +1,36 @@
 import { model, InferSchemaType, Schema, Types } from 'mongoose'
 
+/* 
+THIS SCHEMA WILL STORE DATA OF EVERY DAY
+*/
 
 interface AppStat {
   name: string
   duration: number
-  lastUsedAt: Date
+  tag: "Productive" | "Time waste" | "Untagged"
+  sessions: AppSession[]
 }
 
 interface AppUsage {
-    user: Types.ObjectId,
-    date: string,
-    totalActiveTime: number
+    userId: Types.ObjectId
+    totalActiveTime: number,
     appStats: AppStat[],
-
+    date: String,
 }
+
+interface AppSession{
+    startTime: Date,
+    endTime: Date,
+    duration: number
+}
+
+const AppSessionSchema = new Schema<AppSession>({
+        startTime: { type: Date, required: true },
+        endTime: { type: Date, required: true },
+        duration: { type: Number, required: true },
+    },
+    { _id: false }
+) // contains info about the session(lets say of VSCODE)
 
 const AppStatSchema = new Schema<AppStat>({
     name: { 
@@ -24,23 +41,23 @@ const AppStatSchema = new Schema<AppStat>({
         type: Number,
         required: true 
     },
-    lastUsedAt: {
-        type: Date,
+    tag: {
+        type: String,
+        enum: ["Productive", "Time waste", "Untagged"],
         required: true
-    }
-    // Represents stats of an app, like {Vscode, "3h24m", 24-4-2025}
-})
+    },
+    sessions: [AppSessionSchema],
+}) // contains stats of app by name with multiple sessions(in a day)
 
 const AppUsageSchema = new Schema<AppUsage>({
-    user: { 
+    userId: { 
         type: Schema.Types.ObjectId, 
         ref: "User",
         required: true
     },
-    date: { 
-        type: String, 
-        required: true, 
-        index: true 
+    date: {
+        type: String,
+        require: true
     },
     totalActiveTime: { 
         type: Number, 
@@ -54,5 +71,7 @@ const AppUsageSchema = new Schema<AppUsage>({
     }, {
     timestamps: true
 })
+
+AppUsageSchema.index({ userId: 1, date: -1 }, { unique: true });
 
 export const AppUsageModel = model<AppUsage>("AppUsage", AppUsageSchema)
