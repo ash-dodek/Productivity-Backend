@@ -111,7 +111,6 @@ export const LoginUser = async (req : Request, res: Response) => {
 }
 
 export const LogoutUser = async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken
     res.clearCookie('refreshToken', {
         httpOnly: true,
         sameSite: 'none',
