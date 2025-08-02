@@ -24,7 +24,18 @@ export const registerUser = async (req: Request, res: Response) => {
                 data: user
             }
         )
-    } catch (error) {
+        
+    } catch (error: any) {
+        if(error.code == 11000) {
+            return ApiResponse(
+            res, 
+            {
+                success: false,
+                message: "User already exists",
+                statusCode: 419
+            })
+        }
+
         console.log(error)
         return ApiResponse(
             res, 
