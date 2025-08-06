@@ -5,6 +5,8 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { ApiResponse } from './utils/ApiResponse';
+import appUsageRoute from './routes/appUsage.route'
+import webUsageRoute from './routes/webUsage.route'
 
 dotenv.config()
 
@@ -28,6 +30,8 @@ app.get('/', (req, res) => {
 
 
 app.use('/api/user', userRoute)
+app.use('/api/usage/app', appUsageRoute)
+app.use('/api/usage/web', webUsageRoute)
 
 mongoose.connect(process.env.MONGO_URL!)
 .then(() => {
