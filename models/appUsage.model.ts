@@ -44,7 +44,7 @@ const AppStatSchema = new Schema<AppStat>({
     tag: {
         type: String,
         enum: ["Productive", "Time waste", "Untagged"],
-        required: true
+        default: "Untagged"
     },
     sessions: [AppSessionSchema],
 }) // contains stats of app by name with multiple sessions(in a day)
