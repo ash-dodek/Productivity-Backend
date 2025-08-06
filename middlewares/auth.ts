@@ -5,11 +5,10 @@ import jwt from 'jsonwebtoken';
 export const authorizeUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = req.cookies.refreshToken
-        console.log(token)
         if(!token) 
             return ApiResponse(res, {
             success: false,
-            message: "Unauthorized",
+            message: "Unauthorized - at",
             statusCode: 401
         })
 
