@@ -77,3 +77,56 @@ export const updateWebsiteUsage = async (req: Request, res: Response) => {
         })
     }
 }
+
+export const getWebsiteUsageByURL = async (req: Request, res: Response) => {
+    try {
+        const siteName = req.query?.siteName
+        const siteId = req.query?.siteId
+        const { userId } = (req as any).user
+        if(!siteName && !siteId){
+            return ApiResponse(res, {
+                success: false, 
+                message: "Query not passed",
+                statusCode: 400
+            })
+        }
+
+        const userData = await WebsiteUsageModel.findOne({userId})
+        if(!userData) {
+            return ApiResponse(res, {
+                success: false,
+                message: "No usage for the website",
+                statusCode: 404
+            })
+        }
+        const sitesData = userData.websiteStats
+        // UPDATE LOGIC, TO GET ALL INFO OF AN APP, for a given date or all
+        for(const siteData of sitesData) {
+            if((siteName && siteData.name.toLowerCase() === (siteName as any).toLowerCase()) || ((siteData as any)._id.toString() === siteId)) {
+                return ApiResponse(res, {
+                    success: true,
+                    message: "Usage provided",
+                    data: siteData,
+                    statusCode: 200
+                })
+            }
+            else{
+                return ApiResponse(res, {
+                    success: false, 
+                    message: "Not found- invalid parameter", 
+                    statusCode: 404
+                })
+            }
+        }
+
+        
+
+    } catch (error) {
+        console.log(error)
+        return ApiResponse(res, {
+            success: false, 
+            message: "Interval server error", 
+            statusCode: 500, 
+        })
+    }
+}

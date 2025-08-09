@@ -77,3 +77,58 @@ export const addUsageOfApp = async (req: Request, res: Response) => {
         })
     }
 }
+
+
+export const getAppUsageByName = async (req: Request, res: Response) => {
+    try {
+        const appName = req.query?.appName
+        const appId = req.query?.appId
+        const { userId } = (req as any).user
+        if(!appName && !appId){
+            return ApiResponse(res, {
+                success: false, 
+                message: "Query not passed",
+                statusCode: 400
+            })
+        }
+
+        const userData = await AppUsageModel.findOne({userId})
+        if(!userData) {
+            return ApiResponse(res, {
+                success: false,
+                message: "No usage for the app",
+                statusCode: 404
+            })
+        }
+        const appsData = userData.appStats
+        // UPDATE LOGIC, TO GET ALL INFO OF AN APP, for a given date or all
+        for(const appData of appsData) {
+            if((appData.name === appName) || ((appData as any)._id.toString() === appId)) {
+                return ApiResponse(res, {
+                    success: true,
+                    message: "Usage provided",
+                    data: appData,
+                    statusCode: 200
+                })
+            }
+            else{
+                return ApiResponse(res, {
+                    success: false, 
+                    message: "Not found- invalid parameter", 
+                    statusCode: 404
+                })
+            }
+        }
+
+        
+
+    } catch (error) {
+        console.log(error)
+        return ApiResponse(res, {
+            success: false, 
+            message: "Interval server error", 
+            statusCode: 500, 
+            data: error
+        })
+    }
+}
